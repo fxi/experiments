@@ -58,7 +58,7 @@ function paramsToObject(params) {
  */
 function objectToState(query) {
   onNextFrame(function() {
-    var out = '/';
+    var out = window.location.pathname;
     var params = paramsToObject();
     var keysNew = Object.keys(query);
     var dat;
