@@ -2,12 +2,12 @@
 /* jshint esversion:6 */
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+const path = require("path");
 module.exports = {
   mode : 'development',
   entry: './index.js',
   output: {
-    path: __dirname + '/docs',
+    path:path.resolve(__dirname,'../docs/soundtrip/'),
     filename: 'index_bundle.js'
   },
   plugins: [
