@@ -14,9 +14,9 @@ http://fxi.io/experiments/soundtrip/?artistsong=<artist/song>
 
 ### Sample
 
-[http://fxi.io/experiments/soundtrip/?artistsong=hungry-music/worakls-elea](http://fxi.io/experiments/soundtrip/?artistsong=hungry-music%2Fworakls-elea)
-[http://fxi.io/experiments/soundtrip/?artistsong=vhoor/baiao](http://fxi.io/experiments/soundtrip/?artistsong=vhoor%2Fbaiao)
-[http://fxi.io/experiments/soundtrip/?artistsong=hungry-music/worakls-salzburg](http://fxi.io/experiments/soundtrip/?artistsong=hungry-music%2Fworakls-salzburg)
+- hungry-music/worakls-elea [http://fxi.io/experiments/soundtrip/?artistsong=hungry-music/worakls-elea](http://fxi.io/experiments/soundtrip/?artistsong=hungry-music%2Fworakls-elea)
+- vhoor/baiao [http://fxi.io/experiments/soundtrip/?artistsong=vhoor/baiao](http://fxi.io/experiments/soundtrip/?artistsong=vhoor%2Fbaiao)
+- hungry-music/worakls-salzburg [http://fxi.io/experiments/soundtrip/?artistsong=hungry-music/worakls-salzburg](http://fxi.io/experiments/soundtrip/?artistsong=hungry-music%2Fworakls-salzburg)
 
 
 
