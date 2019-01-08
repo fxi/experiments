@@ -20,6 +20,7 @@ var analyserFFT = new Tone.Analyser({
 });
 
 var player = new Tone.Player().toMaster();
+player.loop=true;
 player.connect(analyser);
 player.connect(analyserFFT);
 
