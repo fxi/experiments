@@ -1,5 +1,5 @@
 /* jshint esversion:6 */
-
+import querystring from 'querystring';
 export {onNextFrame, paramsToObject, objectToState};
 
 var nf =
@@ -21,32 +21,13 @@ function onNextFrame(cb) {
 }
 
 /**
- * Get url query parameter by name
- * @param {String} name Name of the query request name
- * @note http://www.netlobo.com/url_query_string_javascript.html
- */
-//function getUrlParameter(name) {
-  //name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-  //var regexS = '[\\?&]' + name + '=([^&#]*)';
-  //var regex = new RegExp(regexS);
-  //var results = regex.exec(window.location.href);
-  //if (results == null) return '';
-  //else return results[1];
-/*}*/
-
-/**
  * Returns an Array of all url parameters
  * @return {[Array]} [Key Value pairs form URL]
  */
 function paramsToObject(params) {
   var param;
-  var out = {};
   var dec = decodeURIComponent;
-  params = params ? params.split('&') : window.location.search.substring(1).split('&');
-  for (var i = 0, iL = params.length; i < iL; i++) {
-    param = params[i].split('=');
-    out[param[0].toLowerCase()] = dec(param[1]);
-  }
+  var out = querystring.parse(params || window.location.search.substring(1));
   return out;
 }
 
@@ -73,30 +54,11 @@ function objectToState(query) {
     });
 
     if (params) {
-      out = out + '?' + objectToParams(params);
+      out = out + '?' + querystring.stringify(params);
     }
     history.replaceState(null, null, out);
   });
 }
 
 
-/**
- * Convert object to params string
- *
- * @param {Object} data
- * @return {String} params string
- */
-export function objectToParams(data){
-  var esc = encodeURIComponent;
-  var params = [];
 
-  Object.keys(data)
-    .forEach(k => {
-      if(k){
-        params.push(esc(k) + '=' + esc(data[k]));
-      }
-    });
-
-  return params.join('&');
-
-}

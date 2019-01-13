@@ -4,11 +4,13 @@ import {SoundCloud} from './soundcloud.js';
 import {Visualiser} from './visualiser.js';
 import {Player} from './player.js';
 import {paramsToObject,objectToState} from './utils.js';
+
 var elCanvas = document.getElementById('anim');
 var elBadge = document.getElementById('badge');
-var query = paramsToObject();
-query.artistsong = query.artistsong || "hungry-music/worakls-salzburg";
-objectToState(query);
+var options = paramsToObject();
+options.artistSong = options.artistSong || "hungry-music/worakls-salzburg";
+objectToState(options);
+
 
 /**
  * Player
@@ -18,17 +20,18 @@ var player = new Player();
 /**
  * Sound visualiser
  */
+options.message = "Click / tap to start";
+
 var visualiser = new Visualiser({
   elCanvas: elCanvas,
   analyserFFT: player.analyserFFT,
   analyser: player.analyser,
   width: window.innerWidth,
   height: window.innerHeight,
-  message: 'Press space to start',
+  options : options
 });
 
-visualiser.msg();
-
+visualiser.addGui();
 /**
  * SoundCloud
  */
@@ -37,45 +40,51 @@ var soundcloud = new SoundCloud({
   idClient: 'b95f61a90da961736c03f659c03cb0cc',
   dark: false,
   tips:
-    'Press space to start/stop; Use mouse to draw; Press keys 1 or 2 to switch animation mode.',
+    'Click to start / stop; Use mouse to draw; Press keys 1 or 2 to switch animation mode.',
   attribution:
     'Animation made by <a href="https://github.com/fxi" target="_blank">Fred Moser</a>. Tested only on Chrome.',
 });
+
+
+function toggle(){
+  soundcloud.getTrack().then(track => {
+    if (!visualiser.isEnabled()) {
+      player.play(track.stream_url_full);
+      visualiser.start();
+    } else {
+      player.stop();
+      visualiser.stop();
+    }
+  });
+}
+
 
 soundcloud
   //.addTracksBySets('hungry-music/sets/hungry-5-compilation')
   //.addTrackByArtistSong('hungry-music/worakls-salzburg')
   //.addTrackByArtistSong('deafheaven-official/from-the-kettle-onto-the-coil')
-  .addTrackByArtistSong(query.artistsong)
+  .addTrackByArtistSong(options.artistSong)
   .then(() => {
     /**
      * Listners
      */
     window.addEventListener('keydown', function(e) {
       switch (e.keyCode) {
-        case 32:
-          soundcloud.getTrack().then(track => {
-            if (!visualiser.isEnabled()) {
-              player.play(track.stream_url_full);
-              visualiser.start();
-              console.log('start');
-            } else {
-              player.stop();
-              visualiser.stop();
-              console.log('stop');
-            }
-          });
-          break;
+/*        case 32:*/
+          //toggle();
+          /*break;*/
         case 49:
-          visualiser.setMode(1);
+          visualiser.enablePolar();
           break;
         case 50:
-          visualiser.setMode(2);
+          visualiser.enableRainbow();
           break;
         default:
           console.log(e.keyCode);
       }
     });
+
+    elCanvas.addEventListener("click",toggle);
 
     elCanvas.addEventListener('mousemove', function(e) {
       visualiser.setPosition({

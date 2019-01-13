@@ -2,8 +2,8 @@
   "name": "soundtrip",
   "version": "0.0.1",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/fxi/experiments"
+    "type": "git",
+    "url": "https://github.com/fxi/experiments"
   },
   "description": "Toy visualiser for SoundCloud",
   "main": "index.js",
@@ -23,6 +23,7 @@
   "author": "Fred Moser",
   "license": "MIT",
   "dependencies": {
+    "dat.gui": "^0.7.5",
     "google-fonts": "^1.0.0",
     "localforage": "^1.7.3",
     "minstache": "^1.2.0",

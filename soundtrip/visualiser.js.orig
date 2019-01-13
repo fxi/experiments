@@ -1,22 +1,25 @@
 /* jshint esversion:6 */
 import {onNextFrame} from './utils.js';
-import * as dat from 'dat.gui';
-import {paramsToObject,objectToState} from './utils.js';
-
 export {Visualiser};
+import * as dat from 'dat.gui';
 
 var options = {
-  backAlpha: 0.05,
-  scaleFactor: 1.02,
-  rotateSpeed: 0.005,
+  backAlpha: 0.1,
+  scaleFactor: 1.01,
+  //rotateSpeed: 0.005,
+  rotateSpeed: 0.07,
   fadeAlpha: 0.005,
-  polarEnable : false,
   polarLineWidth : 1,
   polarBaseRadius: 150.0,
-  rainbowWidthFactor : 8,
-  rainbowEnable : false,
-  rainbowOffsetX :0,
-  rainbowOffsetY :0,
+  brushSize : 2,
+  brushWidthFactor : 5,
+  brushOffsetX :0,
+  brushOffsetY :0,
+  mode: 1,
+  analyser: null,
+  analyserFFT: null,
+  width: 0,
+  height: 0,
   startMessage: 'Click / tap to start',
 };
 
@@ -25,20 +28,18 @@ Visualiser.prototype.addGui = function(){
   var vis = this;
   var opt = vis.opt;
   var gui = new dat.GUI();
-  var ctrMsg = gui.add(opt, 'startMessage');
-  gui.add(opt, 'backAlpha',0,0.1);
+   var ctrMsg = gui.add(opt, 'startMessage');
+  gui.add(opt, 'backAlpha',0,0.5);
   gui.add(opt, 'scaleFactor',0.8,1.2);
   gui.add(opt, 'rotateSpeed',-0.1,0.1);
   var optPolar = gui.addFolder('Polar mode');
-  optPolar.add(opt, 'polarEnable').listen();
   optPolar.add(opt, 'polarBaseRadius',0,300);
   optPolar.add(opt, 'polarLineWidth',0,5);
-  var optRainbow = gui.addFolder('Rainbow rainbow mode');
-  optRainbow.add(opt,'rainbowEnable').listen();
-  optRainbow.add(opt,'rainbowWidthFactor',5,10);
-  optRainbow.add(opt,'rainbowOffsetX',-vis.width/2,vis.width/2);
-  optRainbow.add(opt,'rainbowOffsetY',-vis.height/2,vis.height/2);
-  gui.add(vis,'saveToClipboard');
+  var optRainbowBrush = gui.addFolder('Rainbow brush mode');
+  optRainbowBrush.add(opt,'brushSize',0,10);
+  optRainbowBrush.add(opt,'brushWidthFactor',0,10);
+  optRainbowBrush.add(opt,'brushOffsetX',-opt.width/2,opt.width/2);
+  optRainbowBrush.add(opt,'brushOffsetY',-opt.height/2,opt.height/2);
   gui.close();
   vis.gui = gui;
 
@@ -54,21 +55,17 @@ Visualiser.prototype.addGui = function(){
 };
 
 
-function Visualiser(config) {
+function Visualiser(opt) {
   var vis = this;
   vis.opt = {};
-  vis.elCanvas = config.elCanvas;
+  vis.elCanvas = opt.elCanvas;
   vis.elCanvasBack = document.createElement('canvas');
-  vis.analyserFFT = config.analyserFFT;
-  vis.analyser = config.analyser;
-  vis.width = config.with || window.innerWidth;
-  vis.height = config.height || window.innerHeight;
   vis.x = 0;
   vis.y = 0;
   vis.i = 0;
   vis.enabled = false;
-  vis.rainbowVerticesPrevious = [];
-  vis.setOptions(config.options);
+  vis.brushVerticesPrevious = [];
+  vis.setOptions(opt);
   vis.ctx = vis.elCanvas.getContext('2d');
   vis.ctxBack = vis.elCanvasBack.getContext('2d');
   vis.setSize();
@@ -79,23 +76,10 @@ function Visualiser(config) {
 Visualiser.prototype.setOptions = function(opt) {
   var vis = this;
   Object.keys(options).forEach(o => {
-    var def = options[o];
-    var option = opt[o];
-
-    var isNumber = typeof def == "number" ;
-    var isBoolean = typeof def == "boolean" ;
-    var optionType = typeof option;
-  
-    if ( optionType == 'undefined') {
-      vis.opt[o] = def;
+    if (typeof opt[o] == 'undefined') {
+      vis.opt[o] = options[o];
     } else {
-      if(isNumber && optionType != "number" ){
-        option = option * 1 ;
-      }
-      if(isBoolean && optionType != "boolean"){
-        option = option === "true" ;
-      } 
-      vis.opt[o] = option;
+      vis.opt[o] = opt[o];
     }
   });
 };
@@ -122,8 +106,8 @@ Visualiser.prototype.setHeight = function(h) {
 Visualiser.prototype.setSize = function(opt) {
   opt = opt || {};
   var vis = this;
-  vis.setWidth(opt.width || vis.width || vis.elCanvas.width);
-  vis.setHeight(opt.height || vis.height || vis.elCanvas.height);
+  vis.setWidth(opt.width || vis.opt.width || vis.elCanvas.width);
+  vis.setHeight(opt.height || vis.opt.height || vis.elCanvas.height);
 };
 
 Visualiser.prototype.updateCenter = function() {
@@ -136,7 +120,7 @@ Visualiser.prototype.updateCenter = function() {
 
 Visualiser.prototype.setMode = function(mode) {
   var vis = this;
-  vis.mode = mode || 'polar';
+  vis.mode = mode || 1;
 };
 
 Visualiser.prototype.setPosition = function(pos) {
@@ -147,10 +131,10 @@ Visualiser.prototype.setPosition = function(pos) {
 };
 
 Visualiser.prototype.getValues = function() {
-  return this.analyser.getValue();
+  return this.opt.analyser.getValue();
 };
 Visualiser.prototype.getValuesFFT = function() {
-  return this.analyserFFT.getValue();
+  return this.opt.analyserFFT.getValue();
 };
 
 Visualiser.prototype.enable = function() {
@@ -180,98 +164,74 @@ Visualiser.prototype.next = function() {
   });
 };
 
-
-
-Visualiser.prototype.saveToClipboard = function(){
-  objectToState(this.opt); 
-  var elTemp = document.createElement('input');
-  var href  = window.location.href;
-  document.body.appendChild(elTemp);
-  elTemp.value = href;
-  elTemp.select();
-  document.execCommand('copy');
-  document.body.removeChild(elTemp);
-  alert("Copied in clipboard !");
-};
-
-
-
 Visualiser.prototype.draw = function() {
   var vis = this;
   if (!vis.enabled){
     //vis.msg();
     return;
   }
-  vis.drawing=true;
   vis.i++;
+  var mode = vis.mode || 1;
 
-  if( vis.opt.polarEnable == false && vis.opt.rainbowEnable == false ){
-    vis.opt.polarEnable = true;
-  }
-  if (vis.opt.polarEnable) {
+  if (mode == 1) {
     vis.drawPolar();
-  }
-  if(vis.opt.rainbowEnable){
-    vis.drawRainbow();
+  } else {
+    vis.drawBrush();
   }
   vis.buildBackground();
-  vis.drawing=false;
   vis.next();
 };
 
-Visualiser.prototype.enablePolar = function(enable) {
+Visualiser.prototype.drawBrush = function() {
   var vis = this;
-  enable = typeof enable === "undefined" ? !vis.opt.polarEnable : enable === false ? false : true;
-  console.log("Polar mode = " + enable);
-  vis.opt.polarEnable = enable;
-};
-
-Visualiser.prototype.enableRainbow = function(enable) {
-  var vis = this;
-  enable = typeof enable === "undefined" ? !vis.opt.rainbowEnable : enable === false ? false : true;
-  console.log("Rainbow mode = " + enable);
-  vis.opt.rainbowEnable = enable;
-};
-
-Visualiser.prototype.drawRainbow = function() {
-  var vis = this;
-  var wf = 10 - vis.opt.rainbowWidthFactor;
-  var ox = vis.opt.rainbowOffsetX;
-  var oy = vis.opt.rainbowOffsetY;
-  var values = vis.getValuesFFT();
-  var x = this.x + ox;
-  var y = this.y + oy;
   var w = 1;
-  var x1 = x;
+  var x1 = this.x;
   var x2 = 0;
-  var y1 = y;
+  var y = this.y;
+  var y1 = this.y;
   var y2 = 0;
+  var px1,px2,py1,py2;
+  var values = vis.getValuesFFT();
+  var cx = vis.opt.width/2;
+  var cy = vis.opt.height/2;
+  var s = vis.opt.brushSize/2;
+  var wf = 10 - vis.opt.brushWidthFactor;
+  var sf =  vis.opt.scaleFactor;
+  var ox = vis.opt.brushOffsetX;
+  var oy = vis.opt.brushOffsetY;
+  var aDx,aDy;
+  var tan = Math.tan(vis.opt.rotateSpeed);
   var c = '';
   var l = values.length;
-  var ws = values.map(v => Math.round(100-Math.abs(v)) / wf);
+  var ws = values.map(v => Math.round(Math.abs(v)) / wf);
   var dx = ws.reduce((a, v) => v + a, 0) / 2;
   var vertices = [];
-  var pX = 0; //previous value's x
 
+  // previous value's x
+  var pX = 0;
 
-  ws.forEach((w, i) => {
-    if (!isFinite(w))
+  values.forEach((v, i) => {
+    if (!isFinite(v))
       return vertices.push({
         x1: x1,
         y1: y1,
         x2: x1,
-        y2: y1
+        y2: y1,
+        w: 0,
       });
-    x1 = x + pX - dx ;
+
+    w = Math.round(Math.abs(v)) / wf;
+    x1 = this.x + pX - dx + ox;
     x2 = x1 + w;
     pX = pX + w;
-    return vertices.push({x1: x1, y1: y, x2: x2, y2: y});
+    return vertices.push({x1: x1, y1: y, x2: x2, y2: y, w: w});
   });
 
-  if (vis.rainbowVerticesPrevious.length == vertices.length) {
+  if (vis.brushVerticesPrevious.length == vertices.length) {
     var vn = {};
-    vis.rainbowVerticesPrevious.forEach((vp, i) => {
+    vis.brushVerticesPrevious.forEach((vp, i) => {
       vn = vertices[i];
+      //c = 'hsl(' + (i / (l - 1)) * 360 + ', ' + vn.w * 10 + '%, 50%)';
       c = 'hsl(' + (i / (l - 1)) * 360 + ', 100%, 50%)';
       vis.ctx.fillStyle = c;
       vis.ctx.strokeStyle = c;
@@ -285,19 +245,18 @@ Visualiser.prototype.drawRainbow = function() {
       */
       vis.ctx.moveTo(vn.x1, vn.y1);
       vis.ctx.lineTo(vn.x2, vn.y2);
-      vis.ctx.save();
-      vis.ctx.translate(vis.center.x, vis.center.y);
-      vis.ctx.rotate(vis.opt.rotateSpeed);
-      vis.ctx.scale(vis.opt.scaleFactor, vis.opt.scaleFactor);
-      vis.ctx.translate(-vis.center.x, -vis.center.y);
-      vis.ctx.lineTo(vp.x2, vp.y2);
-      vis.ctx.lineTo(vp.x1, vp.y1);
-      vis.ctx.restore();
+      px1 = vp.x1 - tan * (vp.y2 - cy);
+      py1 = vp.y1 + tan * (vp.x1 - cx);
+      px2 = vp.x2 - tan * (vp.y1 - cy);
+      py2 = vp.y2 + tan * (vp.x2 - cx);
+
+      vis.ctx.lineTo( px2, py2  );
+      vis.ctx.lineTo( px1, py1  );
       vis.ctx.stroke();
       vis.ctx.fill();
      });
   }
-  vis.rainbowVerticesPrevious = vertices;
+  vis.brushVerticesPrevious = vertices;
 };
 
 
@@ -310,11 +269,11 @@ Visualiser.prototype.drawPolar = function() {
   var values = vis.getValues();
   var l = values.length * 2; // double values length for mirror
   var a = (2 * Math.PI) / (l - 1); // angle in radian
-  var halfTurn = Math.PI/2;
   var theta = 0;
   var vd = 0;
   var v = 0;
   vis.ctx.strokeStyle = vis.nextColor();
+  //vis.ctx.strokeStyle = "hsla(203, 77%, 50%, 0.50)";
   vis.ctx.lineWidth = vis.opt.polarLineWidth;
   vis.ctx.beginPath();
   for (var i = 0; i < l; i++) {
@@ -323,6 +282,7 @@ Visualiser.prototype.drawPolar = function() {
     } else {
       j = i;
     }
+
     v = values[j];
     theta = a * i + Math.PI / 2;
     vd = r * (v + 1);
