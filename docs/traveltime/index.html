@@ -1,0 +1,39 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <div class="container">
+      <h4>Travel time analysis, client side</h4>
+      <small>Experimental work by Fred Moser (2018)</small>
+      <hr>
+      <div id="map"></div>
+      <small>Move the cursor over the map of Burkina-Faso to get a travel time estimation, according to the scenario table presented bellow. Click on the the map to create and download the catchment as a vector file.</small>
+      <hr>
+      <a id="btnDownload" href="#" class="btn btn-primary" disabled=true>Download catchment</a>
+      <hr>
+
+      <div class="card card card-body bg-light">
+        <div class="row">
+          <p id="pos" style="width:100%;display:none"></p>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <div class="form-group">
+              <label for="maxTime">Max travel time in hours</label>
+              <input value=3 class="form-control" id="maxTimeHour" aria-describedby="maxTimeHour" type="number">
+              <small id="maxTimeHourHelp" class="form-text text-muted">Enter the maximum of hours allowed in the travel estimate</small>
+              <hr>
+            </div>
+
+            <label>Set travel scenario</label>
+            <div id="tblModel"></div>
+            <small>You can modify values as in an spreadsheet file</small>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  <script src="index_bundle.js"></script></body>
+</html>
