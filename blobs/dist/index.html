@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Binaural beats generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+
+body {
+  font-family: sans, helvetica, arial;
+  width: 80%;
+  height: 80%;
+}
+
+.channel {
+  width: 100%;
+  padding: 40px;
+  border: 1px solid #000;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.channel .side,
+.channel .hz {
+  display: block;
+  text-align: center;
+}
+
+.channel .inHz {
+  display: block;
+  width: 100%;
+}
+
+.channel .mute
+    </style>
+
+
+  </head>
+  <body>
+
+
+    <button id="start" type="button">start</button>
+    <button id="stop" type="button">stop</button>
+
+    <div class="channel">
+      <label class='side'>left
+        <input id='aMute' type="checkbox" checked>
+      </label>
+      <input class='inHz' id="a" type=range min=0 max=400 value=61>
+      <h1 class='hz' id="aHz">61</h1>
+    </div>
+
+    <div class="channel">
+      <label class='side'>right
+        <input id='bMute' type="checkbox" checked>
+      </label>
+      <input class='inHz' id="b" type=range min=0 max=400 value=61>
+      <h1 class="hz" id="bHz">61</h1>
+    </div>
+
+    <div id=knob></div>
+
+
+
+  <script src="index_bundle.js"></script></body>
+</html>

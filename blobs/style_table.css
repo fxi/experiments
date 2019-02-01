@@ -1,0 +1,145 @@
+.table {
+  max-height:300px;
+}
+
+/* All headers */
+.handsontable {
+  color: var(--fg);
+}
+
+.handsontable span.colHeader {
+    color: var(--fg);
+}
+.handsontable th {
+  background-color: var(--bg);
+}
+.handsontable th:first-child, 
+.handsontable th:nth-child(2), 
+.handsontable td:first-of-type, 
+.handsontable .htNoFrame + th, 
+.handsontable .htNoFrame + td {
+    border: none;
+}
+.handsontable tr:first-child th, .handsontable tr:first-child td {
+    border-top: 1px solid var(--fg)!important;
+    /*border-bottom: 1px solid var(--fg)!important;*/
+}
+.wtBorder.current {
+  background-color: var(--fg)!important;
+}
+
+/* Row headers */
+.ht_clone_left th {
+  background-color: var(--bg);
+}
+
+/* Column headers */
+.ht_clone_top th {
+  background-color: var(--bg);
+}
+/* Row headers */
+/* Bottom */
+.ht_clone_top_left_corner th {
+  border-bottom: 1px solid var(--bg);
+}
+
+/* Left and right */
+.ht_clone_left th {
+  border-right: 1px solid var(--bg);
+  border-left: 1px solid var(--bg);
+}
+
+/* Column headers */
+/* Top, bottom and right */
+.ht_clone_top th {
+  border-top: 1px solid var(--bg);
+  border-right: 1px solid var(--bg);
+  border-bottom: 1px solid var(--bg);
+}
+
+/* Left */
+.ht_clone_top_left_corner th {
+  border-right: 1px solid var(--bg);
+}
+.ht_clone_top_left_corner th {
+  background-color: var(--bg);
+}
+.ht_clone_top_left_corner th {
+  border: 1px solid var(--bg);
+}
+/* Every odd row */
+.ht_master tr:nth-of-type(odd) > td {
+  background-color: var(--bg);
+}
+
+/* Every even row */
+.ht_master tr:nth-of-type(even) > td {
+  background-color: var(--bg);
+}
+
+/* Selected row  */
+/* Add a custom class name in the configuration: currentRowClassName: "foo"; */
+.ht_master tr.foo > td {
+  background-color: var(--bg);
+}
+
+/* Specific row (2) */
+.ht_master tr:nth-child(2) > td {
+  background-color: var(--bg);
+}
+/* Bottom */
+.ht_master tr > td {
+  border-bottom: 1px solid var(--bg);
+}
+
+/* Right */
+.ht_master tr > td {
+  border-right: 1px solid var(--bg);
+}
+/* Every odd column */
+.ht_master tr > td:nth-of-type(odd) {
+  background-color: var(--bg);
+}
+
+/* Every even column */
+.ht_master tr > td:nth-of-type(even) {
+  background-color: var(--bg);
+}
+
+/* Selected column  */
+/* Add a custom class name in the configuration: currentColClassName: "foo"; */
+.ht_master tr > td.foo {
+  background-color: var(--bg);
+}
+
+/* Specific column (B) */
+.ht_master tr > td:nth-child(3) {
+  background-color: var(--bg);
+}
+/* Selected cell */
+.ht_master tr > td.current {
+  background-color: var(--bg);
+}
+
+/* Specific cell (B2) */
+.ht_master tr:nth-child(2) > td:nth-child(3) {
+  background-color: var(--bg);
+}
+
+/* Edit mode */
+.handsontableInput {
+  background-color: var(--fg)!important;
+  color: var(--bg);
+  box-shadow: 0 0 0 2px var(--fg) inset !important;
+}
+.handsontable td.area {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.handsontable tbody th.ht__highlight, .handsontable thead th.ht__highlight {
+  background-color: var(--bg);
+  color: var(--fg);
+
+}
+
