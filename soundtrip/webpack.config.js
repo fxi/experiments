@@ -13,7 +13,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template : './index.html',
-      title : 'Binaural beat generator'
+      title : 'Soundtrip'
     })
   ],
   module : {
