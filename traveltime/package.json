@@ -28,6 +28,7 @@
     "proj4": "^2.5.0"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^1.0.1",
     "file-loader": "^2.0.0",
     "html-loader": "^0.5.5",

@@ -1,6 +1,6 @@
-
 /* jshint esversion:6 */
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require("path");
 module.exports = {
@@ -14,7 +14,13 @@ module.exports = {
     new HtmlWebpackPlugin({
       template : './index.html',
       title : 'Travel Time'
-    })
+    }),
+    new CopyWebpackPlugin(
+      [ { 
+        from : './landcover.tiff', 
+        to: 'landcover.tiff'
+      } ]
+    ),
   ],
   module : {
     rules: [
