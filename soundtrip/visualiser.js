@@ -8,6 +8,7 @@ export {Visualiser};
 var options = {
   backAlpha: 0.05,
   scaleFactor: 1.02,
+  gravity : 0,
   rotateSpeed: 0.005,
   fadeAlpha: 0.005,
   polarEnable : false,
@@ -28,7 +29,8 @@ Visualiser.prototype.addGui = function(){
   var ctrMsg = gui.add(opt, 'startMessage');
   gui.add(opt, 'backAlpha',0,0.1);
   gui.add(opt, 'scaleFactor',0.8,1.2);
-  gui.add(opt, 'rotateSpeed',-0.1,0.1);
+  gui.add(opt, 'gravity',-20,20);
+  gui.add(opt, 'rotateSpeed',-0.5,0.5);
   var optPolar = gui.addFolder('Polar mode');
   optPolar.add(opt, 'polarEnable').listen();
   optPolar.add(opt, 'polarBaseRadius',0,300);
@@ -38,6 +40,7 @@ Visualiser.prototype.addGui = function(){
   optRainbow.add(opt,'rainbowWidthFactor',5,10);
   optRainbow.add(opt,'rainbowOffsetX',-vis.width/2,vis.width/2);
   optRainbow.add(opt,'rainbowOffsetY',-vis.height/2,vis.height/2);
+  gui.add(vis,'resetOptions' );
   gui.add(vis,'saveToClipboard');
   gui.close();
   vis.gui = gui;
@@ -78,6 +81,7 @@ function Visualiser(config) {
 
 Visualiser.prototype.setOptions = function(opt) {
   var vis = this;
+  var setDefault = opt === true;
   Object.keys(options).forEach(o => {
     var def = options[o];
     var option = opt[o];
@@ -86,7 +90,7 @@ Visualiser.prototype.setOptions = function(opt) {
     var isBoolean = typeof def == "boolean" ;
     var optionType = typeof option;
   
-    if ( optionType == 'undefined') {
+    if ( setDefault || optionType == 'undefined') {
       vis.opt[o] = def;
     } else {
       if(isNumber && optionType != "number" ){
@@ -100,6 +104,12 @@ Visualiser.prototype.setOptions = function(opt) {
   });
 };
 
+
+Visualiser.prototype.resetOptions = function() {
+  var vis = this;
+  vis.setOptions(true);
+  objectToState(this.opt); 
+};
 
 
 
@@ -289,6 +299,7 @@ Visualiser.prototype.drawRainbow = function() {
       vis.ctx.translate(vis.center.x, vis.center.y);
       vis.ctx.rotate(vis.opt.rotateSpeed);
       vis.ctx.scale(vis.opt.scaleFactor, vis.opt.scaleFactor);
+      vis.ctx.translate( 0, vis.opt.gravity);
       vis.ctx.translate(-vis.center.x, -vis.center.y);
       vis.ctx.lineTo(vp.x2, vp.y2);
       vis.ctx.lineTo(vp.x1, vp.y1);
@@ -350,6 +361,7 @@ Visualiser.prototype.buildBackground = function() {
   vis.ctxBack.translate(vis.center.x, vis.center.y);
   vis.ctxBack.rotate(vis.opt.rotateSpeed);
   vis.ctxBack.scale(vis.opt.scaleFactor, vis.opt.scaleFactor);
+  vis.ctxBack.translate( 0, vis.opt.gravity);
   vis.ctxBack.translate(-vis.center.x, -vis.center.y);
 
   /*
